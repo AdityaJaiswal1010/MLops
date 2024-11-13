@@ -4,7 +4,7 @@ from steps.clean_data import clean_data
 from steps.evaluate_model import evaluation
 from steps.train_model import train_model
 import logging
-@pipeline(enable_cache=False)
+@pipeline()
 def training_pipeline():
     df = ingest_data()
     # Add this line to debug the columns
