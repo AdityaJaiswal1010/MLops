@@ -74,3 +74,55 @@ class RMSE(Evaluation):
                 + str(e)
             )
             raise e
+
+
+
+# class Evaluation(ABC):
+#     @abstractmethod
+#     def calculate_score(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+#         pass
+
+# class MSE(Evaluation):
+#     def calculate_score(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+#         try:
+#             mse = mean_squared_error(y_true, y_pred)
+#             logging.info(f"The mean squared error value is: {mse}")
+#             return mse
+#         except Exception as e:
+#             logging.error(f"Exception in MSE calculation: {e}")
+#             raise e
+
+# class R2Score(Evaluation):
+#     def calculate_score(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+#         try:
+#             r2 = r2_score(y_true, y_pred)
+#             logging.info(f"The R2 score value is: {r2}")
+#             return r2
+#         except Exception as e:
+#             logging.error(f"Exception in R2 calculation: {e}")
+#             raise e
+
+# class RMSE(Evaluation):
+#     def calculate_score(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+#         try:
+#             rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+#             logging.info(f"The root mean squared error value is: {rmse}")
+#             return rmse
+#         except Exception as e:
+#             logging.error(f"Exception in RMSE calculation: {e}")
+#             raise e
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -325,3 +325,155 @@ class DataCleaning:
             logging.error("Error in handling data: {}".format(e))
             raise e
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# import numpy as np
+# import logging
+# from abc import ABC, abstractmethod
+# import pandas as pd
+# from typing import Union
+# from sklearn.model_selection import train_test_split
+# from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
+# from sklearn.decomposition import PCA
+# from sentence_transformers import SentenceTransformer
+# import re
+# import nltk
+# from nltk.corpus import stopwords
+# from nltk.stem import WordNetLemmatizer
+
+# # Download NLTK data (only needs to be run once)
+# nltk.download('stopwords')
+# nltk.download('wordnet')
+
+# class DataStrategy(ABC):
+#     """
+#     Strategy for data handling
+#     """
+#     @abstractmethod
+#     def handle_data(self, data: pd.DataFrame) -> Union[pd.DataFrame, pd.Series]:
+#         pass
+
+# class DataPreProcessing(DataStrategy):
+#     def __init__(self):
+#         self.model = SentenceTransformer('bert-base-nli-mean-tokens')
+#         self.stop_words = set(stopwords.words('english'))
+#         self.lemmatizer = WordNetLemmatizer()
+#         self.scaler = StandardScaler()
+
+#     def clean_text(self, text: str) -> str:
+#         text = re.sub(r"[^a-zA-Z\s]", "", text).lower()
+#         words = [self.lemmatizer.lemmatize(word) for word in text.split() if word not in self.stop_words]
+#         return " ".join(words)
+
+#     def handle_data(self, data: pd.DataFrame) -> pd.DataFrame:
+#         logging.info("Processing Data")
+#         try:
+#             data = data.drop_duplicates()
+
+#             # Drop unnecessary date-related columns
+#             date_columns = [
+#                 "order_approved_at", "order_delivered_carrier_date",
+#                 "order_delivered_customer_date", "order_estimated_delivery_date",
+#                 "order_purchase_timestamp"
+#             ]
+#             data = data.drop(date_columns, axis=1, errors='ignore')
+
+#             # Drop ID columns that are not useful for modeling
+#             id_columns = ["customer_id", "order_id", "product_id", "seller_id", "customer_unique_id", "order_item_id", "review_id"]
+#             data = data.drop(id_columns, axis=1, errors='ignore')
+
+#             # Handle missing values for numerical columns
+#             for column in data.select_dtypes(include=['float64', 'int64']).columns:
+#                 data[column].fillna(data[column].median(), inplace=True)
+
+#             # Handle missing values for object columns
+#             data.fillna({"review_comment_message": "No review"}, inplace=True)
+
+#             # Clean and encode the review comments
+#             data["cleaned_review_comment"] = data["review_comment_message"].apply(self.clean_text)
+#             bert_embeddings = self.model.encode(data["cleaned_review_comment"].tolist())
+#             bert_embeddings_df = pd.DataFrame(
+#                 bert_embeddings, columns=[f'embedding_{i}' for i in range(bert_embeddings.shape[1])]
+#             )
+
+#             data = pd.concat([data.reset_index(drop=True), bert_embeddings_df], axis=1).drop(
+#                 columns=["review_comment_message", "cleaned_review_comment"]
+#             )
+
+#             # Separate the target variable
+#             # Separate the target variable
+#             if 'review_score' in data.columns:
+#                 review_score = data['review_score']
+#                 data = data.drop('review_score', axis=1)
+#             else:
+#                 logging.error("'review_score' column not found in data.")
+#                 raise KeyError("'review_score' column not found in data.")
+
+#             # Identify non-numeric columns
+#             non_numeric_cols = data.select_dtypes(include=['object']).columns.tolist()
+#             low_cardinality_cols = [col for col in non_numeric_cols if data[col].nunique() <= 50]
+#             high_cardinality_cols = [col for col in non_numeric_cols if data[col].nunique() > 50]
+
+#             # Drop any remaining non-numeric columns (if any)
+#             data = data.select_dtypes(include=[np.number])
+
+#             # Standardize numeric features
+#             data = pd.DataFrame(self.scaler.fit_transform(data), columns=data.columns)
+
+#             # PCA to handle collinearity
+#             pca = PCA(n_components=0.95, random_state=42)
+#             pca_data = pd.DataFrame(
+#                 pca.fit_transform(data), columns=[f'PCA_{i}' for i in range(pca.n_components_)]
+#             )
+
+#             # Add the target variable back to the DataFrame
+#             final_data = pd.concat([pca_data, review_score.reset_index(drop=True)], axis=1)
+
+#             return final_data
+
+#         except Exception as e:
+#             logging.error(f'Exception Occurred - {e}')
+#             raise e
+
+# class DataDivideToTrainAndTest(DataStrategy):
+#     def handle_data(self, data: pd.DataFrame) -> Union[pd.DataFrame, pd.Series]:
+#         try:
+#             X = data.drop(["review_score"], axis=1)
+#             y = data["review_score"]
+#             return train_test_split(X, y, test_size=0.2, random_state=42)
+#         except Exception as e:
+#             logging.error(f'Exception Occurred - {e}')
+#             raise e
+
+# class DataCleaning:
+#     def __init__(self, data: pd.DataFrame, strategy: DataStrategy):
+#         self.data = data
+#         self.strategy = strategy
+
+#     def handle_data(self) -> Union[pd.DataFrame, pd.Series]:
+#         try:
+#             return self.strategy.handle_data(self.data)
+#         except Exception as e:
+#             logging.error(f"Error in handling data: {e}")
+#             raise e
+

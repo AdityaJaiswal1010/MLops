@@ -2,9 +2,15 @@ import logging
 import pandas as pd
 from sklearn.base import RegressorMixin
 from zenml import step
-from src.model_development import RandomForestModel,LightGBMModel,XGBoostModel,LinearRegressionModel,HyperparameterTuner
-@step
+# from zenml.integrations.mlflow.mlflow_experiment_tracker import MLFlowExperimentTracker
+from zenml.client import Client
+import mlflow
 
+from src.model_development import RandomForestModel,LightGBMModel,XGBoostModel,LinearRegressionModel,HyperparameterTuner
+from zenml.client import Client
+experiment_tracker=Client().active_stack.experiment_tracker
+
+@step(experiment_tracker=experiment_tracker.name)
 def train_model(
     x_train: pd.DataFrame,
     x_test: pd.DataFrame,
@@ -16,12 +22,16 @@ def train_model(
         tuner = None
         user_input = "linear_regression"  # Change this to select different models
         if user_input == "lightgbm":
+            mlflow.sklearn.autolog()
             model = LightGBMModel()
         elif user_input == "randomforest":
+            mlflow.sklearn.autolog()
             model = RandomForestModel()
         elif user_input == "xgboost":
+            mlflow.sklearn.autolog()
             model = XGBoostModel()
         elif user_input == "linear_regression":
+            mlflow.sklearn.autolog()
             model = LinearRegressionModel()
         else:
             raise ValueError("Model name not supported")
